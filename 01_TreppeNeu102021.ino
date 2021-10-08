@@ -1,4 +1,4 @@
-//Stairs 10_2021 2x_PIR 1x_LDR_BH1750 1x_UNO
+//Stairs 10_2021 2x_PIR 1x_LDR_BH1750 1x_Mega
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #include <BH1750.h>
 #include <Wire.h>
@@ -22,6 +22,17 @@ int alarmValueBottom = LOW;      // Variable to hold the PIR status
 int ledPin = 13;                 // LED on the arduino board flashes when PIR activated
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 /*
+Connections
+
+  - VCC to 3V3 or 5V
+  - GND to GND
+  - SCL to SCL (A5 on Arduino Uno, Leonardo, etc or 21 on Mega and Due, on
+    esp8266 free selectable)
+  - SDA to SDA (A4 on Arduino Uno, Leonardo, etc or 20 on Mega and Due, on
+    esp8266 free selectable)
+  - ADD to (not connected) or GND
+  
+  
   BH1750 can be physically configured to use two I2C addresses:
     - 0x23 (most common) (if ADD pin had < 0.7VCC voltage)
     - 0x5C (if ADD pin had > 0.7VCC voltage)
@@ -70,6 +81,9 @@ void setup() {
   FastLED.clear();
   FastLED.show();
   Wire.begin();  // Initialize the I2C bus (BH1750 library doesn't do this automatically)  
+                 // On esp8266 you can select SCL and SDA pins using Wire.begin(D4, D3);
+                 // For Wemos / Lolin D1 Mini Pro and the Ambient Light shield use
+                 // Wire.begin(D2, D1);
   // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------
   /*
