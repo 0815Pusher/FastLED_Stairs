@@ -1,4 +1,4 @@
-//Stairs 10_2021 2x_PIR 1x_LDR_BH1750 1x_Mega
+//Stairs 10_2021 2x_PIR 1x_LDR_BH1750 1x_Arduino_Mega
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #include <BH1750.h>
 #include <Wire.h>
@@ -7,20 +7,20 @@
 #error "Requires FastLED 3.1 or later; check github for latest code."
 #endif
 
-#define DATA_PIN                     6                           // WS2812b DataPin
-#define STAIR                           8                            // STAIRs
-#define LEDS_PER_STAIR   15                 // LEDS_PER_STAIR
+#define DATA_PIN          6                            // WS2812b DataPin
+#define STAIR             8                            // STAIRs
+#define LEDS_PER_STAIR   15                            // LEDS_PER_STAIR
 #define NUM_LEDS         STAIR * LEDS_PER_STAIR
 CRGB leds[NUM_LEDS];
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // Set up Variables
 unsigned long timeOut = 60000;   // timestamp to remember when the PIR was triggered.
-int downUp = 0;                             // variable to rememer the direction of travel up or down the stairs
-int alarmPinTop = 10;                   // PIR at the top of the stairs
-int alarmPinBottom = 11;              // PIR at the bottom of the stairs
-int alarmValueTop = LOW;          // Variable to hold the PIR status
+int downUp = 0;                  // variable to rememer the direction of travel up or down the stairs
+int alarmPinTop = 10;            // PIR at the top of the stairs
+int alarmPinBottom = 11;         // PIR at the bottom of the stairs
+int alarmValueTop = LOW;         // Variable to hold the PIR status
 int alarmValueBottom = LOW;      // Variable to hold the PIR status
-int ledPin = 13;                              // LED on the arduino board flashes when PIR activated
+int ledPin = 13;                 // LED on the arduino board flashes when PIR activated
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 /*
   BH1750 can be physically configured to use two I2C addresses:
@@ -32,9 +32,9 @@ int ledPin = 13;                              // LED on the arduino board flashe
 BH1750 lightMeter(0x23);
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // Configuration of the Light dependent resistor (LDR)
-bool useLDR =                      true;        // flag, when true the program uses the LDR, set to "false" if you don't have a LDR sensor.
-long LDRThreshold =               1;        // Only switch on LED's at night when LDR senses low light conditions - you may have to change this value for your circumstances!
-bool readPIRInputs =            true;       // flag, when true, reads the PIR sensors. Disabled (false) by the program when LDR indicated that there is enough light.
+bool useLDR =                   true;        // flag, when true the program uses the LDR, set to "false" if you don't have a LDR sensor.
+long LDRThreshold =                1;        // Only switch on LED's at night when LDR senses low light conditions - you may have to change this value for your circumstances!
+bool readPIRInputs =            true;        // flag, when true, reads the PIR sensors. Disabled (false) by the program when LDR indicated that there is enough light.
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 const CRGB::HTMLColorCode colors[90] = {CRGB::Amethyst, CRGB::Aqua, CRGB::Blue, CRGB::BlueViolet, CRGB::Brown, CRGB::Brown, CRGB::Brown, CRGB::Chartreuse, CRGB::Chocolate,
@@ -51,18 +51,18 @@ const CRGB::HTMLColorCode colors[90] = {CRGB::Amethyst, CRGB::Aqua, CRGB::Blue, 
                                        };
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void setup() {
-  //  Serial.begin (9600);                                                                             // only requred for debugging
+   Serial.begin (9600);                                                       // only requred for debugging
 
-  pinMode(ledPin, OUTPUT);                                                                    // initilise the onboard pin 13 LED as an indicator
-  pinMode(alarmPinTop, INPUT_PULLUP);                                             // for PIR at top of stairs initialise the input pin and use the internal restistor
+  pinMode(ledPin, OUTPUT);                                                     // initilise the onboard pin 13 LED as an indicator
+  pinMode(alarmPinTop, INPUT_PULLUP);                                          // for PIR at top of stairs initialise the input pin and use the internal restistor
   pinMode(alarmPinBottom, INPUT_PULLUP);                                       // for PIR at bottom of stairs initialise the input pin and use the internal restistor
-  delay (2000);                                                                                          // it takes the sensor 2 seconds to scan the area around it before it can Fire
+  delay (2000);                                                                // it takes the sensor 2 seconds to scan the area around it before it can Fire
   FastLED.addLeds<WS2812, DATA_PIN, GRB>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(16);
   FastLED.setMaxPowerInVoltsAndMilliamps(5, 5000);
   FastLED.clear();
   FastLED.show();
-  Wire.begin();                                                                               // Initialize the I2C bus (BH1750 library doesn't do this automatically)
+  Wire.begin();                                                                // Initialize the I2C bus (BH1750 library doesn't do this automatically)
   // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------
   /*
@@ -93,7 +93,7 @@ void setup() {
        BH1750_ONE_TIME_HIGH_RES_MODE_2
   */
   // -------------------------------------------------------------------------------------------------------------------------------------------------
-  if (lightMeter.begin(BH1750::CONTINUOUS_HIGH_RES_MODE)) {                 // begin returns a boolean that can be used to detect setup problems.
+  if (lightMeter.begin(BH1750::ONE_TIME_HIGH_RES_MODE)) {                 // begin returns a boolean that can be used to detect setup problems.
     Serial.println(F("BH1750 Advanced begin"));
   } else {
     Serial.println(F("Error initialising BH1750"));
@@ -114,49 +114,53 @@ void setup() {
 // -------------------------------------------------------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------------------------------------------------------
 void loop() {
-  float lux = lightMeter.readLightLevel();
-  // By default read the PIR inputs (unless LDR sensors are used and it is light enough...)
   readPIRInputs = true;
-  if (useLDR) {
-    float lux = lightMeter.readLightLevel();
-    // -------------------------------------------------------------------------------------------------------------------------------------------------
-    // Check if LDR senses low light conditions ...
-    if (lux >= LDRThreshold) {
-      // There is enough light, the stairs/ledstips will not be activated (readPIRInputs = false)
-      readPIRInputs = false;
-      // Show that stair will not turn on / on PIR detection, due to LDR logic (daylight mode detected)
-     // -------------------------------------------------------------------------------------------------------------------------------------------------
-      Serial.println("LDR detected Daylight according to LDRThreshold configuration. Steps Off");
-      Serial.print("LDR Average value = ");
-      Serial.println(lux);
-      
-      delay(30000);
-    }
-    else {
-      // It is dark enough. The stairs/ledstips will be activated. (readPIRInputs = true)
-      alarmValueTop = LOW;
-      alarmValueBottom = LOW;
-      Serial.println("LDR detected Night according to LDRThreshold configuration. Steps On");
-      Serial.print("LDR Average value = ");
-      Serial.println(lux);
-    }
+  while (!lightMeter.measurementReady(true)) {
+    yield();
   }
+  float lux = lightMeter.readLightLevel();
+  Serial.print("Light: ");
+  Serial.print(lux);
+  Serial.println(" lx");
+  lightMeter.configure(BH1750::ONE_TIME_HIGH_RES_MODE);
+  // -------------------------------------------------------------------------------------------------------------------------------------------------
+  // Check if LDR senses low light conditions ...
+  if (lux > LDRThreshold) {
+    // There is enough light, the stairs/ledstips will not be activated (readPIRInputs = false)
+    readPIRInputs = false;
+    // Show that stair will not turn on / on PIR detection, due to LDR logic (daylight mode detected)
+    Serial.println("LDR detected Daylight according to LDRThreshold configuration. Steps Off");    
+    leds[0] = CRGB::Black;
+    FastLED.show();
+    delay(10000);
+  }
+  else {
+    // It is dark enough. The stairs/ledstips will be activated. (readPIRInputs = true)
+    alarmValueTop = LOW;
+    alarmValueBottom = LOW;
+    Serial.println("LDR detected Night according to LDRThreshold configuration. Steps On");
+  }
+  // -------------------------------------------------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------------------------------------
   // Read the PIR inputs ?
   if (readPIRInputs) {
-    alarmValueTop = digitalRead(alarmPinTop);          // Constantly poll the PIR at the top of the stairs
-    alarmValueBottom = digitalRead(alarmPinBottom);    // Constantly poll the PIR at the bottom of the stairs
+    alarmValueTop = digitalRead(alarmPinTop);                // Constantly poll the PIR at the top of the stairs
+    alarmValueBottom = digitalRead(alarmPinBottom);     // Constantly poll the PIR at the bottom of the stairs
   }
-  if (alarmValueTop == HIGH && downUp != 2)  {        // the 2nd term allows timeOut to be contantly reset if one lingers at the top of the stairs before decending but will not allow the bottom PIR to reset timeOut as you decend past it.
-    timeOut = millis();                                // Timestamp when the PIR is triggered.  The LED cycle wil then start.
+  if (alarmValueTop == HIGH && downUp != 2)  {                                           // the 2nd term allows timeOut to be contantly reset if one lingers at the top of the stairs before decending but will not allow the bottom PIR to reset timeOut as you decend past it.
+    timeOut = millis();                                                    // Timestamp when the PIR is triggered.  The LED cycle wil then start.
     downUp = 1;
-    topdown(random8(0, 6));                            // lights up the strip from top down
+    topdown(random8(0, 6));                                         // lights up the strip from top down
   }
-  if (alarmValueBottom == HIGH && downUp != 1)  {      // the 2nd term allows timeOut to be contantly reset if one lingers at the bottom of the stairs before decending but will not allow the top PIR to reset timeOut as you decend past it.
-    timeOut = millis();                                // Timestamp when the PIR is triggered.  The LED cycle wil then start.
+  if (alarmValueBottom == HIGH && downUp != 1)  {                                          // the 2nd term allows timeOut to be contantly reset if one lingers at the bottom of the stairs before decending but will not allow the top PIR to reset timeOut as you decend past it.
+    timeOut = millis();                                                        // Timestamp when the PIR is triggered.  The LED cycle wil then start.
     downUp = 2;
-    topdown(random8(0, 6));                            // lights up the strip from top down
+    topdown(random8(0, 6));                                         // lights up the strip from top down
   }
   if (timeOut + 10000 < millis() && timeOut + 15000 < millis()) {                            //switch off LED's in the direction of travel.
     if (downUp == 1) {
@@ -199,6 +203,7 @@ void topdown(int mode) {
   }
 }
 // -------------------------------------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------------------------------------------------------
 void ledoff(int mode) {
   Serial.println(mode);
   switch (mode) {
@@ -223,6 +228,7 @@ void ledoff(int mode) {
   }
 }
 // -------------------------------------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------------------------------------------------------
 void all_off(int wait) {
   if (downUp != 2)
     for (int j = 0; j < STAIR; j++) {
@@ -243,6 +249,7 @@ void all_off(int wait) {
       FastLED.delay(wait);
     }
 }
+// -------------------------------------------------------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------------------------------------------------------
 // Fade light each step strip
 void colourWipeDownUp(uint32_t color, int wait, int r) {
@@ -275,6 +282,7 @@ void colourWipeDownUp(uint32_t color, int wait, int r) {
       }
     }
 }
+// -------------------------------------------------------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------------------------------------------------------
 void GreenRed (uint16_t wait) {
   if (downUp != 2) {
@@ -314,46 +322,7 @@ void GreenRed (uint16_t wait) {
     }
   }
 }
-/*
-  void GreenRed (uint16_t wait) {
-  if (downUp != 2) {
-    for (int j = 0; j < STAIR; j++) {
-      int start = NUM_LEDS / STAIR * j;
-      for (int i = start; i < start + LEDS_PER_STAIR; i++) {
-        leds[i] =  CRGB::Green;
-      }
-      FastLED.show();
-      FastLED.delay(wait);
-    }
-    for (int j = 0; j < STAIR; j++) {
-      int start = NUM_LEDS / (LEDS_PER_STAIR / 2) * j;
-      for (int i = start; i < start + (LEDS_PER_STAIR / 2); i++) {
-        leds[i + 5] =  CRGB::Red;
-      }
-      FastLED.show();
-      FastLED.delay(80);
-    }
-  }
-  if (downUp != 1) {
-    for (int j = STAIR; j > 0; j--) {
-      int start = NUM_LEDS / STAIR * j;
-      for (int i = start; i > start - LEDS_PER_STAIR; i--) {
-        leds[i - 1] =  CRGB::Green;
-      }
-      FastLED.show();
-      FastLED.delay(wait);
-    }
-    for (int j = STAIR; j > 0; j--) {
-      int start = NUM_LEDS / (LEDS_PER_STAIR / 2) * j;
-      for (int i = start; i > start - (LEDS_PER_STAIR / 2); i--) {
-        leds[i - 5] =  CRGB::Red;
-      }
-      FastLED.show();
-      FastLED.delay(80);
-    }
-  }
-  }
-*/
+// -------------------------------------------------------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------------------------------------------------------
 void efekt (uint16_t wait, uint32_t color) {
   if (downUp != 2)
@@ -390,6 +359,7 @@ void efekt (uint16_t wait, uint32_t color) {
     }
 }
 // -------------------------------------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------------------------------------------------------
 void efekt1 (uint16_t wait, uint32_t color) {
   //  if (downUp != 2)
   for (uint16_t j = 0; j < STAIR; j++) {
@@ -412,7 +382,8 @@ void efekt1 (uint16_t wait, uint32_t color) {
     }
   }
 }
-
+// -------------------------------------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------------------------------------------------------
 void efekt2 (uint16_t wait, uint32_t color, int white) {
   if (downUp != 2)
     for (uint16_t j = 0; j < STAIR; j++) {
