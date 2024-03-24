@@ -1,4 +1,4 @@
-# FastLED_Stairs thanks @romi06 to start with a nice Code...
+# FastLED_Stairs 
 My Stairs at Home, 15Leds per Step, 8 Steps 2xPIR 1xLDR_BH1750
 
 Configs: Stair/LEDS_PER_STAIR, LightSensor On/Off, LDRThreshold
