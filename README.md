@@ -1,17 +1,29 @@
 NEW:
 TreppeNeu2024.ino :
+
 Totaly Optimized / a lot of new LED Cases 4 on or off
->> Non-blocking Timing Mechanism, optimize to none blocking main Loop now use millis():
->> Implement DEBUG 0 or 1
->> Optimize Sensor Readings and Configurations
->> Modular Functions (checkLDR, handlePIR, clearLEDs)
->> Use More Efficient Data Structures and Algorithms
->> Efficient LED Control, a lot of new Cases and LED Effekts
->> Adding more comments and Debug (Serial.print & Serial.println)
->> Add totalOffTimeout / to turne komplete off after totalOffTimeout 
->> Add debounceDelay / debounce the 2 PIR sensors
+
+Non-blocking Timing Mechanism, optimize to none blocking main Loop now use millis():
+
+Implement DEBUG 0 or 1
+
+Adding more comments and Debug (Serial.print & Serial.println)
+
+Optimize Sensor Readings and Configurations
+
+Modular Functions (checkLDR, handlePIR, clearLEDs)
+
+Use More Efficient Data Structures and Algorithms
+ 
+Efficient LED Control, a lot of new Cases and LED Effekts
+
+Add totalOffTimeout / to turne komplete off after totalOffTimeout
+ 
+Add debounceDelay / debounce the 2 PIR sensors
 
 Too much changes, i dont wont write all down ...forgot ^^
+
+
 
 
 # FastLED_Stairs 
